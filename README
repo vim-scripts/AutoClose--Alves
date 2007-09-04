@@ -1,0 +1,60 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=2009
+
+*NOTE*
+======
+The header of the plugin says it is on version 1.1, but this is wrong. The 1.4 version is indeed the 1.4 version only with a wrong header. Next version I'll fix it.
+
+Overview
+=======
+This plugin was  born  as  a  personal  need  to  have some little special features from other editors into my preferred one. The Eclipse IDE editor has an auto-complete for  open-close  pair  of  characters  feature  that I always wanted into Vim.
+
+As soon  as you type  a character that  could have a  close pair,  Eclipse automatically puts its  pair in front of your cursor,  and  if you continue to type and type  the close character,  Eclipse is smart enough  to not insert it again (it just move your cursor one character forward).
+
+But the Eclipse editor don't stop  there.  If you type an "open" character on any part of your code that  should not have a pair completion,  it will not insert the close character for you.
+
+The AutoClose plugin is an attempt to reproduce this behavior on Vim. 
+
+Configuration
+==========
+1. Definning characters to auto close
+--------------------------------------------------
+If you  are not sattisfied  with the default  characters to close  you can define your own by setting the global variable g:AutoClosePairs.
+
+The only thing to be careful is that this variable must be a dictionary on the following format:
+
+    {"<open_char>": "<close_char>"}
+
+Otherwise the  plugin will  not recognize  the settings  and will  use the default values.
+
+Following is the default declaration for auto close chars. If this configuration is enought, you don't need to configure nothing:
+
+    let g:AutoClosePairs = {'(': ')', '{': '}', '[': ']', '"': '"', "'": "'"}
+
+
+2. Definning protected regions
+-----------------------------------------
+Inside some special  regions  the  auto  close  feature  is far from util, actually we  can say  that on those  regions,  this feature  is worst  than no feature at all. This is the case for "Comments" and "Strings".
+
+If you edit files with this characteristic and there is more than comments and strings where you would like  to protect from auto close,  just define the global variable g:AutoCloseProtectedRegions.
+
+This variable must be  a list of strings or the  plugin will not recognize it and will  use the defaults parameters.  The format  of this variable should be:
+
+    ["<protected_region1>", "<protected_region2>", ...]
+
+Following is the default declaration to the protected regions.  If you are satisfied with this, you don't have to set this setting:
+
+    let g:AutoCloseProtectedRegions. = ["Comment", "String", "Character"]
+
+
+3. Turning AutoComplete on and off
+------------------------------------------------
+As AutoComplete change the buffer you are editing, sometimes you just want to turn this feature off for a while and than turn it on again.
+
+AutoComplete provide three  commands that can be mapped to  any key as you want to do that task:
+
+    1. AutoCloseOn
+    2. AutoCloseOff
+    3. AutoCloseToggle
+
+And if you don't want to map anything, just use them on the command mode.
+
