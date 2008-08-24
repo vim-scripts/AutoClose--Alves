@@ -45,6 +45,10 @@ function! s:IsEmptyPair()
     return get(s:charsToClose, l:prev, "\0") == l:next
 endfunction
 
+function! s:GetCurrentSyntaxRegion()
+    return synIDattr(synIDtrans(synID(line('.'), col('.'), 1)), 'name')
+endfunction
+
 function! s:GetCurrentSyntaxRegionIf(char)
     let l:origin_line = getline('.')
     let l:changed_line = strpart(l:origin_line, 0, col('.')-1) . a:char . strpart(l:origin_line, col('.')-1)
@@ -55,7 +59,13 @@ function! s:GetCurrentSyntaxRegionIf(char)
 endfunction
 
 function! s:IsForbidden(char)
-    return index(s:protectedRegions, s:GetCurrentSyntaxRegionIf(a:char)) >= 0
+    let l:result = index(s:protectedRegions, s:GetCurrentSyntaxRegion()) >= 0
+    if l:result
+        return l:result
+    endif
+    let l:region = s:GetCurrentSyntaxRegionIf(a:char)
+    let l:result = index(s:protectedRegions, l:region) >= 0
+    return l:result && l:region == 'Comment'
 endfunction
 
 function! s:InsertPair(char)
@@ -104,6 +114,15 @@ function! s:Backspace()
         return "\<BS>\<Del>"
     endif    
     return "\<BS>"
+endfunction
+
+function! s:ToggleAutoClose()
+    let s:running = !s:running
+    if s:running
+        echo "AutoClose ON"
+    else
+        echo "AutoClose OFF"
+    endif
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -158,7 +177,7 @@ exec "inoremap <silent> <BS> " . s:turn_ve_on . "<C-R>=<SID>Backspace()<CR>" . s
 " Define convenient commands
 command! AutoCloseOn :let s:running = 1
 command! AutoCloseOff :let s:running = 0
-command! AutoCloseToggle :let s:running = !s:running
+command! AutoCloseToggle :call s:ToggleAutoClose()
 
 " Clean up
 unlet s:turn_ve_on
