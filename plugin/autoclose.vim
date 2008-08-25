@@ -5,7 +5,7 @@
 " Maintainer: Thiago Alves <thiago.salves@gmail.com>
 " URL: http://thiagoalves.org
 " Licence: This script is released under the Vim License.
-" Last modified: 08/11/2008 
+" Last modified: 08/25/2008 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 let s:debug = 0
@@ -87,8 +87,8 @@ function! s:ClosePair(char)
 endfunction
 
 function! s:CheckPair(char)
-    let l:occur = 0
     let l:lastpos = 0
+    let l:occur = stridx(getline('.'), a:char, l:lastpos) == 0 ? 1 : 0
 
     while l:lastpos > -1
         let l:lastpos = stridx(getline('.'), a:char, l:lastpos+1)
