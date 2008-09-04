@@ -8,7 +8,7 @@
 " Last modified: 08/25/2008 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-let s:debug = 0
+let s:debug = 1
 
 " check if script is already loaded
 if s:debug == 0 && exists("g:loaded_AutoClose")
@@ -125,13 +125,21 @@ function! s:ToggleAutoClose()
     endif
 endfunction
 
+function! s:SetVEAll()
+    let s:save_ve = &ve
+    set ve=all
+    return ""
+endfunction
+
+function! s:RestoreVE()
+    exec "set ve=" . s:save_ve
+    unlet s:save_ve
+    return ""
+endfunction
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Configuration
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" variables that represents the turn on and turn off of virtualedition
-let s:turn_ve_on= "<C-O>:let save_ve = &ve<CR><C-O>:set ve=all<CR>"
-let s:turn_ve_off = "<C-O>:let &ve = save_ve<CR>"
- 
 " let user define which character he/she wants to autocomplete
 if exists("g:AutoClosePairs") && type(g:AutoClosePairs) == type({})
     let s:charsToClose = g:AutoClosePairs
@@ -165,20 +173,17 @@ for key in keys(s:charsToClose)
         let open_func_arg = '"' . key . '"'
         let close_func_arg = '"' . s:charsToClose[key] . '"'
     endif 
+     
     if key == s:charsToClose[key]
-        exec "inoremap <silent> " . key . " " . s:turn_ve_on . "<C-R>=<SID>CheckPair(" . open_func_arg . ")<CR>" . s:turn_ve_off
+        exec "inoremap <silent> " . key . " <C-R>=<SID>SetVEAll()<CR><C-R>=<SID>CheckPair(" . open_func_arg . ")<CR><C-R>=<SID>RestoreVE()<CR>"
     else
-        exec "inoremap <silent> " . s:charsToClose[key] . " " . s:turn_ve_on . "<C-R>=<SID>ClosePair(" . close_func_arg . ")<CR>" . s:turn_ve_off
-        exec "inoremap <silent> " . key . " " . s:turn_ve_on . "<C-R>=<SID>InsertPair(" . open_func_arg . ")<CR>" . s:turn_ve_off
+        exec "inoremap <silent> " . s:charsToClose[key] . " <C-R>=<SID>SetVEAll()<CR><C-R>=<SID>ClosePair(" . close_func_arg . ")<CR><C-R>=<SID>RestoreVE()<CR>"
+        exec "inoremap <silent> " . key . " <C-R>=<SID>SetVEAll()<CR><C-R>=<SID>InsertPair(" . open_func_arg . ")<CR><C-R>=<SID>RestoreVE()<CR>"
     endif
 endfor
-exec "inoremap <silent> <BS> " . s:turn_ve_on . "<C-R>=<SID>Backspace()<CR>" . s:turn_ve_off
+exec "inoremap <silent> <BS> <C-R>=<SID>SetVEAll()<CR><C-R>=<SID>Backspace()<CR><C-R>=<SID>RestoreVE()<CR>"
 
 " Define convenient commands
 command! AutoCloseOn :let s:running = 1
 command! AutoCloseOff :let s:running = 0
 command! AutoCloseToggle :call s:ToggleAutoClose()
-
-" Clean up
-unlet s:turn_ve_on
-unlet s:turn_ve_off
